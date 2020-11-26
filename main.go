@@ -142,24 +142,28 @@ func (c dropCmd) Run(args []string) error {
 		return fmt.Errorf("failed to parse go.mod: %v", err)
 	}
 
+	var changed bool
 	for _, r := range modFile.Replace {
 		if len(args) >= 1 && strings.Contains(r.Old.Path, args[0]) || c.All {
+			changed = true
 			println("drop " + r.New.Path)
 
 			modFile.DropReplace(r.Old.Path, "")
 			if err != nil {
 				return fmt.Errorf("failed to drop replace: %v", err)
 			}
+		}
+	}
 
-			data, err = modFile.Format()
-			if err != nil {
-				return fmt.Errorf("failed to format: %v", err)
-			}
+	if changed {
+		data, err = modFile.Format()
+		if err != nil {
+			return fmt.Errorf("failed to format: %v", err)
+		}
 
-			err = ioutil.WriteFile(gomod, data, os.ModePerm)
-			if err != nil {
-				return fmt.Errorf("failed to write to: %v", err)
-			}
+		err = ioutil.WriteFile(gomod, data, os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("failed to write to: %v", err)
 		}
 	}
 
