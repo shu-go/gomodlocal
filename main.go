@@ -189,11 +189,10 @@ func (c dropCmd) Run(args []string) error {
 
 func main() {
 	app := gli.NewWith(&globalCmd{})
-	app.Name = "gomodrepl"
-	app.Desc = "replace go.mod by guessed path"
+	app.Name = "gomodlocal"
+	app.Desc = "replace go.mod by guessed local path"
 	app.Version = Version
-	app.Usage = `gomodrepl replace MODULE_NAME {MODULE_PATH}`
+	app.Usage = `gomodlocal replace MODULE_NAME {MODULE_PATH}`
 	app.Copyright = "(C) 2020 Shuhei Kubota"
 	app.Run(os.Args)
-
 }

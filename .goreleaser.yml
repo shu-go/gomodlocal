@@ -1,11 +1,11 @@
-project_name: gomodrepl
+project_name: gomodlocal
 env:
   - GO111MODULE=on
 before:
   hooks:
     - go mod tidy
 builds:
-  - binary: gomodrepl
+  - binary: gomodlocal
     flags:
       - -trimpath
     ldflags:
