@@ -30,6 +30,7 @@ type globalCmd struct {
 type replaceCmd struct {
 }
 type dropCmd struct {
+	All bool `cli:"all,a"`
 }
 
 func (c replaceCmd) Run(args []string) error {
@@ -120,7 +121,7 @@ func (c replaceCmd) Run(args []string) error {
 }
 
 func (c dropCmd) Run(args []string) error {
-	if len(args) == 0 {
+	if len(args) == 0 && !c.All {
 		return errors.New("no target module specified.")
 	}
 
@@ -141,33 +142,25 @@ func (c dropCmd) Run(args []string) error {
 		return fmt.Errorf("failed to parse go.mod: %v", err)
 	}
 
-	var tgtRepl *modfile.Replace
 	for _, r := range modFile.Replace {
-		if strings.Contains(r.Old.Path, args[0]) {
-			tgtRepl = r
-			break
+		if len(args) >= 1 && strings.Contains(r.Old.Path, args[0]) || c.All {
+			println("drop " + r.New.Path)
+
+			modFile.DropReplace(r.Old.Path, "")
+			if err != nil {
+				return fmt.Errorf("failed to drop replace: %v", err)
+			}
+
+			data, err = modFile.Format()
+			if err != nil {
+				return fmt.Errorf("failed to format: %v", err)
+			}
+
+			err = ioutil.WriteFile(gomod, data, os.ModePerm)
+			if err != nil {
+				return fmt.Errorf("failed to write to: %v", err)
+			}
 		}
-	}
-
-	if tgtRepl == nil {
-		return fmt.Errorf("no module found for `%v`", args[0])
-	}
-
-	println("drop " + tgtRepl.New.Path)
-
-	modFile.DropReplace(tgtRepl.Old.Path, "")
-	if err != nil {
-		return fmt.Errorf("failed to drop replace: %v", err)
-	}
-
-	data, err = modFile.Format()
-	if err != nil {
-		return fmt.Errorf("failed to format: %v", err)
-	}
-
-	err = ioutil.WriteFile(gomod, data, os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("failed to write to: %v", err)
 	}
 
 	return nil
