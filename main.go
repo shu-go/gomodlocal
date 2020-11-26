@@ -28,6 +28,7 @@ type globalCmd struct {
 }
 
 type replaceCmd struct {
+	Abs bool `cli:"absolute,abs"`
 }
 type dropCmd struct {
 	All bool `cli:"all,a"`
@@ -67,6 +68,11 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("no module found for `%v`", args[0])
 	}
 
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("can not get working directory!?: %v", err)
+	}
+
 	var newPath string
 	if len(args) == 2 {
 		abs, err := filepath.Abs(args[1])
@@ -75,11 +81,6 @@ func (c replaceCmd) Run(args []string) error {
 		}
 		newPath = abs
 	} else {
-		wd, err := os.Getwd()
-		if err != nil {
-			return fmt.Errorf("can not get working directory!?: %v", err)
-		}
-
 		oldModCompos := strings.Split(tgtMod.Path, "/")
 		wdPathCompos := strings.Split(wd, string(filepath.Separator))
 
@@ -100,6 +101,13 @@ func (c replaceCmd) Run(args []string) error {
 		newPath = strings.Join(newPathCompo, string(filepath.Separator))
 	}
 
+	if !c.Abs {
+		newPath, err = filepath.Rel(wd, newPath)
+		if err != nil {
+			return fmt.Errorf("can not get relative path: %v", err)
+		}
+	}
+
 	_, err = os.Stat(newPath)
 	if err != nil {
 		return fmt.Errorf("local pkg not found: %v", err)
@@ -112,12 +120,12 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("failed to add replace: %v", err)
 	}
 
+	modFile.Cleanup()
+
 	data, err = modFile.Format()
 	if err != nil {
 		return fmt.Errorf("failed to format: %v", err)
 	}
-
-	modFile.Cleanup()
 
 	err = ioutil.WriteFile(gomod, data, os.ModePerm)
 	if err != nil {
