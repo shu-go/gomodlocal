@@ -35,7 +35,7 @@ type dropCmd struct {
 
 func (c replaceCmd) Run(args []string) error {
 	if len(args) == 0 {
-		return errors.New("no target module specified.")
+		return errors.New("no target module specified")
 	}
 
 	gomod := "./go.mod"
@@ -77,7 +77,7 @@ func (c replaceCmd) Run(args []string) error {
 	} else {
 		wd, err := os.Getwd()
 		if err != nil {
-			return fmt.Errorf("cant get working directory!?: %v", err)
+			return fmt.Errorf("can not get working directory!?: %v", err)
 		}
 
 		oldModCompos := strings.Split(tgtMod.Path, "/")
@@ -93,7 +93,7 @@ func (c replaceCmd) Run(args []string) error {
 			}
 		}
 		if oi == -1 || wi == -1 {
-			return errors.New("could not find common path.")
+			return errors.New("can not find common path")
 		}
 
 		newPathCompo := append(wdPathCompos[:wi], oldModCompos[oi:]...)
@@ -129,7 +129,7 @@ func (c replaceCmd) Run(args []string) error {
 
 func (c dropCmd) Run(args []string) error {
 	if len(args) == 0 && !c.All {
-		return errors.New("no target module specified.")
+		return errors.New("no target module specified")
 	}
 
 	gomod := "./go.mod"
