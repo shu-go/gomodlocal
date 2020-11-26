@@ -100,6 +100,11 @@ func (c replaceCmd) Run(args []string) error {
 		newPath = strings.Join(newPathCompo, string(filepath.Separator))
 	}
 
+	_, err = os.Stat(newPath)
+	if err != nil {
+		return fmt.Errorf("local pkg not found: %v", err)
+	}
+
 	println(tgtMod.Path, "=>", newPath)
 
 	err = modFile.AddReplace(tgtMod.Path, "", newPath, "")
