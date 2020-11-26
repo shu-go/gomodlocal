@@ -112,6 +112,8 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("failed to format: %v", err)
 	}
 
+	modFile.Cleanup()
+
 	err = ioutil.WriteFile(gomod, data, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to write to: %v", err)
@@ -160,6 +162,8 @@ func (c dropCmd) Run(args []string) error {
 		if err != nil {
 			return fmt.Errorf("failed to format: %v", err)
 		}
+
+		modFile.Cleanup()
 
 		err = ioutil.WriteFile(gomod, data, os.ModePerm)
 		if err != nil {
