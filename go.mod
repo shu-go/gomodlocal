@@ -9,5 +9,3 @@ require (
 	golang.org/x/mod v0.3.0
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
-
-replace github.com/shu-go/gli v0.0.0-20201111232558-3bd97830629d => ..\gli
