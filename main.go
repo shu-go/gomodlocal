@@ -78,7 +78,7 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("no module found for `%v`", args[0])
 	}
 
-	// find local mod (newPath) starting from wd
+	// find local mod file path (localPath) starting from wd
 
 	wd, err := os.Getwd()
 	if err != nil {
@@ -137,7 +137,7 @@ func (c replaceCmd) Run(args []string) error {
 		}
 	}
 
-	// check dest mod
+	// check a go.mod of requred module
 
 	_, err = os.Stat(localPath)
 	if err != nil {
@@ -169,7 +169,7 @@ func (c replaceCmd) Run(args []string) error {
 		}
 	}
 
-	// replace content
+	// add a replace directive
 
 	println(tgtMod.Path, "=>", localPath)
 
@@ -185,7 +185,7 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("failed to format: %v", err)
 	}
 
-	// write
+	// write to my go.mod
 
 	err = ioutil.WriteFile(gomod, data, os.ModePerm)
 	if err != nil {
