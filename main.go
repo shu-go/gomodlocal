@@ -30,8 +30,10 @@ type globalCmd struct {
 }
 
 type replaceCmd struct {
-	Abs bool `cli:"absolute,abs"`
+	Abs   bool `cli:"absolute,abs"`
+	Force bool `cli:"force" help:"do not check dest module path"`
 }
+
 type dropCmd struct {
 	All bool `cli:"all,a"`
 }
@@ -157,8 +159,10 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("failed to parse go.mod: %v", err)
 	}
 
-	if destModFile.Module.Mod.Path != tgtMod.Path {
-		return fmt.Errorf("dest mod(%v) in %v is not %v", destModFile.Module.Mod.Path, newPath, tgtMod.Path)
+	if !c.Force {
+		if destModFile.Module.Mod.Path != tgtMod.Path {
+			return fmt.Errorf("dest mod(%v) in %v is not %v", destModFile.Module.Mod.Path, newPath, tgtMod.Path)
+		}
 	}
 
 	// replace content
