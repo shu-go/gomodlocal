@@ -123,6 +123,12 @@ func (c replaceCmd) Run(args []string) error {
 		if err != nil {
 			return fmt.Errorf("can not get relative path: %v", err)
 		}
+		if !strings.HasPrefix(newPath, ".") {
+			// "hoge" -> "./hoge"
+
+			//newPath = filepath.Join(".", newPath) => still "hoge"
+			newPath = "." + string(filepath.Separator) + newPath //=> "./hoge"
+		}
 	}
 
 	// check dest mod
