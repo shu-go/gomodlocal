@@ -30,12 +30,16 @@ type globalCmd struct {
 }
 
 type replaceCmd struct {
-	Abs   bool `cli:"absolute,abs"`
-	Force bool `cli:"force" help:"do not check dest module path"`
+	_ struct{} `help:"add a replace directive"`
+
+	Abs   bool `cli:"absolute,abs" help:"local path is absolute (default: relative)"`
+	Force bool `cli:"force" help:"do not check 'require' path in my go.mod vs 'module' path in go.mod of required module"`
 }
 
 type dropCmd struct {
-	All bool `cli:"all,a"`
+	_ struct{} `help:"drop replace directive(s)"`
+
+	All bool `cli:"all,a" help:"drop all replace directives"`
 }
 
 func (c replaceCmd) Run(args []string) error {
