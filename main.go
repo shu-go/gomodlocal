@@ -22,6 +22,8 @@ func init() {
 	}
 }
 
+const gomod = "./go.mod"
+
 type globalCmd struct {
 	Replace replaceCmd `cli:"replace,r"`
 	Drop    dropCmd    `cli:"drop,d"`
@@ -39,10 +41,8 @@ func (c replaceCmd) Run(args []string) error {
 		return errors.New("no target module specified")
 	}
 
-	gomod := "go.mod"
-	mygomod := filepath.Join(".", gomod)
 
-	f, err := os.Open(mygomod)
+	f, err := os.Open(gomod)
 	if err != nil {
 		return fmt.Errorf("go.mod not found: %v", err)
 	}
@@ -54,7 +54,7 @@ func (c replaceCmd) Run(args []string) error {
 	f.Close()
 	f = nil
 
-	modFile, err := modfile.Parse(mygomod, data, nil)
+	modFile, err := modfile.Parse(gomod, data, nil)
 	if err != nil {
 		return fmt.Errorf("failed to parse go.mod: %v", err)
 	}
@@ -155,7 +155,7 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("failed to format: %v", err)
 	}
 
-	err = ioutil.WriteFile(mygomod, data, os.ModePerm)
+	err = ioutil.WriteFile(gomod, data, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to write to: %v", err)
 	}
@@ -168,10 +168,7 @@ func (c dropCmd) Run(args []string) error {
 		return errors.New("no target module specified")
 	}
 
-	gomod := "./go.mod"
-	mygomod := filepath.Join(".", gomod)
-
-	f, err := os.Open(mygomod)
+	f, err := os.Open(gomod)
 	if err != nil {
 		return fmt.Errorf("go.mod not found: %v", err)
 	}
@@ -181,7 +178,7 @@ func (c dropCmd) Run(args []string) error {
 		return fmt.Errorf("failed to open go.mod: %v", err)
 	}
 
-	modFile, err := modfile.Parse(mygomod, data, nil)
+	modFile, err := modfile.Parse(gomod, data, nil)
 	if err != nil {
 		return fmt.Errorf("failed to parse go.mod: %v", err)
 	}
@@ -207,7 +204,7 @@ func (c dropCmd) Run(args []string) error {
 
 		modFile.Cleanup()
 
-		err = ioutil.WriteFile(mygomod, data, os.ModePerm)
+		err = ioutil.WriteFile(gomod, data, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("failed to write to: %v", err)
 		}
