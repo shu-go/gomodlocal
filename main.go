@@ -41,6 +41,7 @@ func (c replaceCmd) Run(args []string) error {
 		return errors.New("no target module specified")
 	}
 
+	// read my go.mod
 
 	f, err := os.Open(gomod)
 	if err != nil {
@@ -71,6 +72,8 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("no module found for `%v`", args[0])
 	}
 
+	// find local mod (newPath) starting from wd
+
 	wd, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("can not get working directory!?: %v", err)
@@ -84,13 +87,20 @@ func (c replaceCmd) Run(args []string) error {
 		}
 		newPath = abs
 	} else {
+		// oldModCompos == [github.com shu-go gli]
+		// wdPathCompos == [C: github.com shu-go gomodlocal]
+		//    ^ where you want to replace with localpath
 		oldModCompos := strings.Split(tgtMod.Path, "/")
 		wdPathCompos := strings.Split(wd, string(filepath.Separator))
 
 		var oi, wi int
 	loop:
 		for oi = len(oldModCompos) - 1; oi >= 0; oi-- {
+			// oldModCompos[oi]: gli -> shu-go -> github.com
+
 			for wi = len(wdPathCompos) - 1; wi >= 0; wi-- {
+				// oi == 2: gli vs each in [gomodlocal(miss) shu-go(miss) github.com(miss) C:(miss)]
+				// oi == 1: shu-go vs each in [gomodlocal(miss) shu-go(HIT!!)]
 				if oldModCompos[oi] == wdPathCompos[wi] {
 					break loop
 				}
@@ -100,23 +110,27 @@ func (c replaceCmd) Run(args []string) error {
 			return errors.New("can not find common path")
 		}
 
+		// newPathCompo == [C: github.com shu-go] + [gli]
+		// newPath == C:\github.com\shu-go\gli
 		newPathCompo := append(wdPathCompos[:wi], oldModCompos[oi:]...)
 		newPath = strings.Join(newPathCompo, string(filepath.Separator))
 	}
 
 	if !c.Abs {
+		// wd == C:\github.com\shu-go\gomodlocal
+		// newPath == ..\gli
 		newPath, err = filepath.Rel(wd, newPath)
 		if err != nil {
 			return fmt.Errorf("can not get relative path: %v", err)
 		}
 	}
 
+	// check dest mod
+
 	_, err = os.Stat(newPath)
 	if err != nil {
 		return fmt.Errorf("local pkg not found: %v", err)
 	}
-
-	// check desg go.mod
 
 	destgomod := filepath.Join(newPath, gomod)
 
@@ -141,6 +155,8 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("dest mod(%v) in %v is not %v", destModFile.Module.Mod.Path, newPath, tgtMod.Path)
 	}
 
+	// replace content
+
 	println(tgtMod.Path, "=>", newPath)
 
 	err = modFile.AddReplace(tgtMod.Path, "", newPath, "")
@@ -154,6 +170,8 @@ func (c replaceCmd) Run(args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to format: %v", err)
 	}
+
+	// write
 
 	err = ioutil.WriteFile(gomod, data, os.ModePerm)
 	if err != nil {
