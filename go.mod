@@ -1,6 +1,6 @@
 module github.com/shu-go/gomodlocal
 
-go 1.15
+go 1.16
 
 require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
