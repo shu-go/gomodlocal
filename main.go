@@ -89,33 +89,33 @@ func (c replaceCmd) Run(args []string) error {
 		}
 		newPath = abs
 	} else {
-		// oldModCompos == [github.com shu-go gli]
-		// wdPathCompos == [C: github.com shu-go gomodlocal]
+		// reqPathComponents == [github.com shu-go gli]
+		// wdPathComponents == [C: github.com shu-go gomodlocal]
 		//    ^ where you want to replace with localpath
-		oldModCompos := strings.Split(tgtMod.Path, "/")
-		wdPathCompos := strings.Split(wd, string(filepath.Separator))
+		reqPathComponents := strings.Split(tgtMod.Path, "/")
+		wdPathComponents := strings.Split(wd, string(filepath.Separator))
 
-		var oi, wi int
+		var ri, wi int
 	loop:
-		for oi = len(oldModCompos) - 1; oi >= 0; oi-- {
-			// oldModCompos[oi]: gli -> shu-go -> github.com
+		for ri = len(reqPathComponents) - 1; ri >= 0; ri-- {
+			// reqPathComponents[ri]: gli -> shu-go -> github.com
 
-			for wi = len(wdPathCompos) - 1; wi >= 0; wi-- {
-				// oi == 2: gli vs each in [gomodlocal(miss) shu-go(miss) github.com(miss) C:(miss)]
-				// oi == 1: shu-go vs each in [gomodlocal(miss) shu-go(HIT!!)]
-				if oldModCompos[oi] == wdPathCompos[wi] {
+			for wi = len(wdPathComponents) - 1; wi >= 0; wi-- {
+				// ri == 2: gli vs each in [gomodlocal(miss) shu-go(miss) github.com(miss) C:(miss)]
+				// ri == 1: shu-go vs each in [gomodlocal(miss) shu-go(HIT!!)]
+				if reqPathComponents[ri] == wdPathComponents[wi] {
 					break loop
 				}
 			}
 		}
-		if oi == -1 || wi == -1 {
+		if ri == -1 || wi == -1 {
 			return errors.New("can not find common path")
 		}
 
-		// newPathCompo == [C: github.com shu-go] + [gli]
+		// newPathCompos == [C: github.com shu-go] + [gli]
 		// newPath == C:\github.com\shu-go\gli
-		newPathCompo := append(wdPathCompos[:wi], oldModCompos[oi:]...)
-		newPath = strings.Join(newPathCompo, string(filepath.Separator))
+		newPathCompos := append(wdPathComponents[:wi], reqPathComponents[ri:]...)
+		newPath = strings.Join(newPathCompos, string(filepath.Separator))
 	}
 
 	if !c.Abs {
