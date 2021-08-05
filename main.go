@@ -85,13 +85,13 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("can not get working directory!?: %v", err)
 	}
 
-	var newPath string
+	var localPath string
 	if len(args) == 2 {
 		abs, err := filepath.Abs(args[1])
 		if err != nil {
 			return fmt.Errorf("invalid path: %v", err)
 		}
-		newPath = abs
+		localPath = abs
 	} else {
 		// reqPathComponents == [github.com shu-go gli]
 		// wdPathComponents == [C: github.com shu-go gomodlocal]
@@ -116,35 +116,35 @@ func (c replaceCmd) Run(args []string) error {
 			return errors.New("can not find common path")
 		}
 
-		// newPathCompos == [C: github.com shu-go] + [gli]
-		// newPath == C:\github.com\shu-go\gli
-		newPathCompos := append(wdPathComponents[:wi], reqPathComponents[ri:]...)
-		newPath = strings.Join(newPathCompos, string(filepath.Separator))
+		// localPathCompos == [C: github.com shu-go] + [gli]
+		// localPath == C:\github.com\shu-go\gli
+		localPathCompos := append(wdPathComponents[:wi], reqPathComponents[ri:]...)
+		localPath = strings.Join(localPathCompos, string(filepath.Separator))
 	}
 
 	if !c.Abs {
 		// wd == C:\github.com\shu-go\gomodlocal
-		// newPath == ..\gli
-		newPath, err = filepath.Rel(wd, newPath)
+		// localPath == ..\gli
+		localPath, err = filepath.Rel(wd, localPath)
 		if err != nil {
 			return fmt.Errorf("can not get relative path: %v", err)
 		}
-		if !strings.HasPrefix(newPath, ".") {
+		if !strings.HasPrefix(localPath, ".") {
 			// "hoge" -> "./hoge"
 
-			//newPath = filepath.Join(".", newPath) => still "hoge"
-			newPath = "." + string(filepath.Separator) + newPath //=> "./hoge"
+			//localPath = filepath.Join(".", localPath) => still "hoge"
+			localPath = "." + string(filepath.Separator) + localPath //=> "./hoge"
 		}
 	}
 
 	// check dest mod
 
-	_, err = os.Stat(newPath)
+	_, err = os.Stat(localPath)
 	if err != nil {
 		return fmt.Errorf("local pkg not found: %v", err)
 	}
 
-	destgomod := filepath.Join(newPath, gomod)
+	destgomod := filepath.Join(localPath, gomod)
 
 	df, err := os.Open(destgomod)
 	if err != nil {
@@ -165,15 +165,15 @@ func (c replaceCmd) Run(args []string) error {
 
 	if !c.Force {
 		if destModFile.Module.Mod.Path != tgtMod.Path {
-			return fmt.Errorf("dest mod(%v) in %v is not %v", destModFile.Module.Mod.Path, newPath, tgtMod.Path)
+			return fmt.Errorf("dest mod(%v) in %v is not %v", destModFile.Module.Mod.Path, localPath, tgtMod.Path)
 		}
 	}
 
 	// replace content
 
-	println(tgtMod.Path, "=>", newPath)
+	println(tgtMod.Path, "=>", localPath)
 
-	err = modFile.AddReplace(tgtMod.Path, "", newPath, "")
+	err = modFile.AddReplace(tgtMod.Path, "", localPath, "")
 	if err != nil {
 		return fmt.Errorf("failed to add replace: %v", err)
 	}
