@@ -137,7 +137,7 @@ func (c replaceCmd) Run(args []string) error {
 		}
 	}
 
-	// check a go.mod of requred module
+	// check a go.mod of required module
 
 	_, err = os.Stat(localPath)
 	if err != nil {
