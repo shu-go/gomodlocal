@@ -245,6 +245,16 @@ func (c dropCmd) Run(args []string) error {
 	return nil
 }
 
+func (c globalCmd) Run(app *gli.App, args []string) error {
+	if len(args) == 0 {
+		app.Help(os.Stderr)
+		return nil
+	}
+
+	args = append([]string{"replace"}, args...)
+	return app.Run(args)
+}
+
 func main() {
 	app := gli.NewWith(&globalCmd{})
 	app.Name = "gomodlocal"
@@ -252,5 +262,9 @@ func main() {
 	app.Version = version
 	app.Usage = `gomodlocal replace MODULE_NAME {MODULE_PATH}`
 	app.Copyright = "(C) 2020 Shuhei Kubota"
-	app.Run(os.Args)
+	app.SuppressErrorOutput = true
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+	}
 }
