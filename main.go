@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/shu-go/gli"
+	"github.com/shu-go/gli/v2"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/mod/module"
 )
