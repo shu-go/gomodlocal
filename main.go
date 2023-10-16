@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -47,7 +47,7 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("go.mod not found: %v", err)
 	}
 
-	data, err := ioutil.ReadAll(f)
+	data, err := io.ReadAll(f)
 	if err != nil {
 		return fmt.Errorf("failed to open go.mod: %v", err)
 	}
@@ -144,7 +144,7 @@ func (c replaceCmd) Run(args []string) error {
 		return fmt.Errorf("dest go.mod not found: %v", err)
 	}
 
-	data, err = ioutil.ReadAll(df)
+	data, err = io.ReadAll(df)
 	if err != nil {
 		return fmt.Errorf("failed to open go.mod: %v", err)
 	}
@@ -180,7 +180,7 @@ func (c replaceCmd) Run(args []string) error {
 
 	// write to my go.mod
 
-	err = ioutil.WriteFile(gomod, data, os.ModePerm)
+	err = os.WriteFile(gomod, data, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to write to: %v", err)
 	}
@@ -198,7 +198,7 @@ func (c dropCmd) Run(args []string) error {
 		return fmt.Errorf("go.mod not found: %v", err)
 	}
 
-	data, err := ioutil.ReadAll(f)
+	data, err := io.ReadAll(f)
 	if err != nil {
 		return fmt.Errorf("failed to open go.mod: %v", err)
 	}
@@ -229,7 +229,7 @@ func (c dropCmd) Run(args []string) error {
 
 		modFile.Cleanup()
 
-		err = ioutil.WriteFile(gomod, data, os.ModePerm)
+		err = os.WriteFile(gomod, data, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("failed to write to: %v", err)
 		}
