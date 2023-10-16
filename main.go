@@ -7,20 +7,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/shu-go/gli"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/mod/module"
 )
 
-var version string
-
-func init() {
-	if version == "" {
-		version = "dev-" + time.Now().Format("20060102")
-	}
-}
+var Version string
 
 const gomod = "./go.mod"
 
@@ -259,7 +252,7 @@ func main() {
 	app := gli.NewWith(&globalCmd{})
 	app.Name = "gomodlocal"
 	app.Desc = "replace go.mod by guessed local path"
-	app.Version = version
+	app.Version = Version
 	app.Usage = `gomodlocal replace MODULE_NAME {MODULE_PATH}`
 	app.Copyright = "(C) 2020 Shuhei Kubota"
 	app.SuppressErrorOutput = true
