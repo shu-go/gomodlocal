@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/shu-go/gli"
@@ -91,6 +92,13 @@ func (c replaceCmd) Run(args []string) error {
 		//    ^ where you want to replace with localpath
 		reqPathComponents := strings.Split(tgtMod.Path, "/")
 		wdPathComponents := strings.Split(wd, string(filepath.Separator))
+
+		verRE := regexp.MustCompile(`^v\d`)
+		if len(reqPathComponents) > 1 {
+			if verRE.FindString(reqPathComponents[len(reqPathComponents)-1]) != "" {
+				reqPathComponents = reqPathComponents[:len(reqPathComponents)-1]
+			}
+		}
 
 		var ri, wi int
 	loop:
