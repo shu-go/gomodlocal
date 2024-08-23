@@ -1,3 +1,4 @@
+version: 2
 project_name: gomodlocal
 env:
   - GO111MODULE=on
@@ -30,3 +31,16 @@ archives:
         format: zip
 release:
   prerelease: auto
+changelog:
+  filters:
+    exclude:
+    - '^test:'
+  groups:
+    - title: 'Features'
+      regexp: "^.*feat[(\\w)!]*:+.*$"
+      order: 0
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)!]*:+.*$"
+      order: 1
+    - title: 'Others'
+      order: 999
