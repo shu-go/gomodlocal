@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/shu-go/gli/v2 v2.3.0
-	golang.org/x/mod v0.20.0
+	golang.org/x/mod v0.23.0
 )
 
 require (
