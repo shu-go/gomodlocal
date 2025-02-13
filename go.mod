@@ -1,6 +1,6 @@
 module github.com/shu-go/gomodlocal
 
-go 1.23
+go 1.24
 
 require (
 	github.com/shu-go/gli/v2 v2.3.0
